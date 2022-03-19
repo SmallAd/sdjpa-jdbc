@@ -20,14 +20,10 @@ public class AuthorDaoImpl implements AuthorDao {
 
     @Override
     public Author getById(Long id) {
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
 
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT  * FROM bookdb2.author WHERE id = " + id);
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT  * FROM bookdb2.author WHERE id = " + id)) {
 
             if (resultSet.next()) {
                 Author author = new Author();
