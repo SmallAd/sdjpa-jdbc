@@ -33,28 +33,14 @@ public class AuthorDaoImpl implements AuthorDao {
             resultSet = ps.executeQuery();
 
             if (resultSet.next()) {
-                Author author = new Author();
-                author.setId(id);
-                author.setFirstName(resultSet.getString("first_name"));
-                author.setLastName(resultSet.getString("last_name"));
-                return author;
+                return getAuthorFromRS(resultSet);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
 
-                if (connection != null) {
-                    connection.close();
-                }
-
-                if (ps != null) {
-                    ps.close();
-                }
-
-                if (resultSet != null) {
-                    resultSet.close();
-                }
+                closeAll(connection, ps, resultSet);
 
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -78,33 +64,40 @@ public class AuthorDaoImpl implements AuthorDao {
             resultSet = ps.executeQuery();
 
             if (resultSet.next()){
-                Author author = new Author();
-                author.setId(resultSet.getLong("id"));
-                author.setFirstName(resultSet.getString("first_name"));
-                author.setLastName(resultSet.getString("last_name"));
-
-                return author;
+                return getAuthorFromRS(resultSet);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
-                if (nonNull(connection)) {
-                    connection.close();
-                }
-
-                if (nonNull(ps)) {
-                    ps.close();
-                }
-
-                if (nonNull(resultSet)) {
-                    resultSet.close();
-                }
+                closeAll(connection, ps, resultSet);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
 
         return null;
+    }
+
+    private Author getAuthorFromRS(ResultSet resultSet) throws SQLException {
+        Author author = new Author();
+        author.setId(resultSet.getLong("id"));
+        author.setFirstName(resultSet.getString("first_name"));
+        author.setLastName(resultSet.getString("last_name"));
+        return author;
+    }
+
+    private void closeAll(Connection connection, PreparedStatement ps, ResultSet resultSet) throws SQLException {
+        if (nonNull(connection)) {
+            connection.close();
+        }
+
+        if (nonNull(ps)) {
+            ps.close();
+        }
+
+        if (nonNull(resultSet)) {
+            resultSet.close();
+        }
     }
 }
