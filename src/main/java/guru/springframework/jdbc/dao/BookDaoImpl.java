@@ -12,9 +12,11 @@ import static java.util.Objects.nonNull;
 public class BookDaoImpl implements BookDao {
 
     private final DataSource dataSource;
+    private final AuthorDao authorDao;
 
-    public BookDaoImpl(DataSource dataSource) {
+    public BookDaoImpl(DataSource dataSource, AuthorDao authorDao) {
         this.dataSource = dataSource;
+        this.authorDao = authorDao;
     }
 
     @Override
@@ -90,14 +92,19 @@ public class BookDaoImpl implements BookDao {
             ps.setString(1, book.getIsbn());
             ps.setString(2, book.getPublisher());
             ps.setString(3, book.getTitle());
-            ps.setLong(4, book.getAuthorId());
+
+            if (nonNull(book.getAuthor())) {
+                ps.setLong(4, book.getAuthor().getId());
+            } else {
+                ps.setNull(4, -5);
+            }
             ps.execute();
 
             Statement statement = connection.createStatement();
 
             resultSet = statement.executeQuery("SELECT LAST_INSERT_ID()");
 
-            if (resultSet.next()){
+            if (resultSet.next()) {
                 Long savedId = resultSet.getLong(1);
                 return getById(savedId);
             }
@@ -127,7 +134,10 @@ public class BookDaoImpl implements BookDao {
             ps.setString(1, book.getIsbn());
             ps.setString(2, book.getPublisher());
             ps.setString(3, book.getTitle());
-            ps.setLong(4, book.getAuthorId());
+
+            if (nonNull(book.getAuthor())) {
+                ps.setLong(4, book.getAuthor().getId());
+            }
             ps.setLong(5, book.getId());
             ps.execute();
 
@@ -172,7 +182,7 @@ public class BookDaoImpl implements BookDao {
         book.setIsbn(resultSet.getString("isbn"));
         book.setTitle(resultSet.getString("title"));
         book.setPublisher(resultSet.getString("publisher"));
-        book.setAuthorId(resultSet.getLong("author_id"));
+        book.setAuthor(authorDao.getById(resultSet.getLong("author_id")));
         return book;
     }
 

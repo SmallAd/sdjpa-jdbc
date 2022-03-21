@@ -1,10 +1,7 @@
 package guru.springframework.jdbc.domain;
 
 import java.util.Objects;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Book {
@@ -15,7 +12,9 @@ public class Book {
     private String isbn;
     private String publisher;
     private String title;
-    private Long authorId;
+
+    @Transient
+    private Author author;
 
     public Book() {
     }
@@ -71,11 +70,11 @@ public class Book {
         this.title = title;
     }
 
-    public Long getAuthorId() {
-        return authorId;
+    public Author getAuthor() {
+        return author;
     }
 
-    public void setAuthorId(Long authorId) {
-        this.authorId = authorId;
+    public void setAuthor(Author authorId) {
+        this.author = authorId;
     }
 }
